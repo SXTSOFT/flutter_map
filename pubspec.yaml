@@ -17,6 +17,6 @@ dependencies:
   transparent_image: ^0.1.0
   async: ^2.0.8
   flutter_image: ^1.0.0
-  cached_network_image: ^0.7.0
+  cached_network_image: ^0.8.0
 dev_dependencies:
   pedantic: ^1.4.0
