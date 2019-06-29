@@ -18,7 +18,6 @@ export 'src/layer/circle_layer.dart';
 export 'src/layer/group_layer.dart';
 export 'src/layer/layer.dart';
 export 'src/layer/marker_layer.dart';
-export 'src/layer/mbtiles/mbtiles_image_provider.dart';
 export 'src/layer/overlay_image_layer.dart';
 export 'src/layer/polygon_layer.dart';
 export 'src/layer/polyline_layer.dart';
