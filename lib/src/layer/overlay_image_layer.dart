@@ -79,9 +79,11 @@ class OverlayImageLayer extends StatelessWidget {
               .add(Offset(pos1.x.toDouble(), pos1.y.toDouble()));
           overlayImageOpt.offsets
               .add(Offset(pos2.x.toDouble(), pos2.y.toDouble()));
-          _loadImage(overlayImageOpt.imageProvider).then((image) {
-            overlayImageOpt.image = image;
-          });
+          if (overlayImageOpt.image == null) {
+            _loadImage(overlayImageOpt.imageProvider).then((image) {
+              overlayImageOpt.image = image;
+            });
+          }
         }
 
         var overlayImages = <Widget>[];
