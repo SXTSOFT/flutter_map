@@ -196,3 +196,53 @@ class Transformation {
     return CustomPoint(x, y);
   }
 }
+
+class RicentCrs extends Crs {
+  @override
+  String get code => "RicentCrs";
+
+  bool get infinite => false;
+
+  @override
+  final Projection projection;
+
+  @override
+  final Transformation transformation;
+
+  @override
+  num scale(double zoom) {
+    return math.pow(2, zoom);
+  }
+
+  @override
+  num zoom(double scale) {
+    return math.log(scale) / math.ln2;
+  }
+
+  @override
+  Tuple2<double, double> get wrapLat => const Tuple2(-512.0, 512.0);
+
+  @override
+  Tuple2<double, double> get wrapLng => null;
+
+  const RicentCrs()
+      : projection = const ProjectionLatlng(),
+        transformation = const Transformation(1, 0, -1, 0),
+        super();
+}
+class ProjectionLatlng extends Projection {
+  const ProjectionLatlng() : super();
+  @override
+  Bounds<double> get bounds => new Bounds<double>(
+      CustomPoint<double>(-180.0, -90.0), CustomPoint<double>(180.0, 90.0));
+
+  @override
+  CustomPoint<num> project(LatLng latlng) {
+    return CustomPoint(latlng.longitude, latlng.latitude);
+  }
+
+  @override
+  LatLng unproject(CustomPoint<num> point) {
+    return LatLng(point.y, point.x);
+  }
+}
