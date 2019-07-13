@@ -7,7 +7,7 @@ import 'package:flutter_map/src/core/bounds.dart';
 import 'package:flutter_map/src/core/point.dart';
 import 'package:flutter_map/src/core/util.dart' as util;
 import 'package:flutter_map/src/map/map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:flutter_map/latlong/latlong.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter_image/network.dart';
@@ -577,5 +577,27 @@ class CustomTileProvider extends TileProvider {
   @override
   ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
     return AssetImage(_getTileUrl(coords, options));
+  }
+}
+
+class SingleImageTileProvider extends TileProvider {
+  const SingleImageTileProvider();
+
+  @override
+  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
+    //return
+  }
+}
+
+class _SingleImageProvider extends ImageProvider {
+  _SingleImageProvider();
+  @override
+  ImageStreamCompleter load(key) {
+    return null;
+  }
+
+  @override
+  Future obtainKey(ImageConfiguration configuration) {
+    return null;
   }
 }

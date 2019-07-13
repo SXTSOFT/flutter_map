@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:flutter_map/latlong/latlong.dart';
 import 'package:tuple/tuple.dart';
-import 'package:latlong/latlong.dart';
 import 'package:flutter_map/src/core/bounds.dart';
 
 import 'package:flutter_map/src/core/point.dart';
@@ -220,7 +220,7 @@ class RicentCrs extends Crs {
   }
 
   @override
-  Tuple2<double, double> get wrapLat => const Tuple2(-512.0, 512.0);
+  Tuple2<double, double> get wrapLat => null;
 
   @override
   Tuple2<double, double> get wrapLng => null;
@@ -230,6 +230,7 @@ class RicentCrs extends Crs {
         transformation = const Transformation(1, 0, -1, 0),
         super();
 }
+
 class ProjectionLatlng extends Projection {
   const ProjectionLatlng() : super();
   @override

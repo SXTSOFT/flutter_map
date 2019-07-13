@@ -1,4 +1,4 @@
-import 'package:latlong/latlong.dart';
+import 'package:flutter_map/latlong/latlong.dart';
 
 class CenterZoom {
   final LatLng center;

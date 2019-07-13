@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:flutter_map/latlong/latlong.dart';
 
 import '../widgets/drawer.dart';
 
@@ -80,29 +80,29 @@ class AnimatedMapControllerPageState extends State<AnimatedMapControllerPage>
         height: 80.0,
         point: london,
         builder: (ctx) => Container(
-              key: Key('blue'),
-              child: FlutterLogo(),
-            ),
+          key: Key('blue'),
+          child: FlutterLogo(),
+        ),
       ),
       Marker(
         width: 80.0,
         height: 80.0,
         point: dublin,
         builder: (ctx) => Container(
-              child: FlutterLogo(
-                key: Key('green'),
-                colors: Colors.green,
-              ),
-            ),
+          child: FlutterLogo(
+            key: Key('green'),
+            colors: Colors.green,
+          ),
+        ),
       ),
       Marker(
         width: 80.0,
         height: 80.0,
         point: paris,
         builder: (ctx) => Container(
-              key: Key('purple'),
-              child: FlutterLogo(colors: Colors.purple),
-            ),
+          key: Key('purple'),
+          child: FlutterLogo(colors: Colors.purple),
+        ),
       ),
     ];
 

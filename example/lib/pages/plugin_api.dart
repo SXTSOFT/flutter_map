@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:latlong/latlong.dart';
+import 'package:flutter_map/latlong/latlong.dart';
 
 import '../widgets/drawer.dart';
 

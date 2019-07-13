@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:latlong/latlong.dart';
+import 'package:flutter_map/latlong/latlong.dart';
 
 void main() {
   testWidgets('flutter_map', (tester) async {
@@ -26,16 +26,16 @@ class _TestAppState extends State<TestApp> {
       height: 80.0,
       point: LatLng(45.5231, -122.6765),
       builder: (ctx) => Container(
-            child: FlutterLogo(),
-          ),
+        child: FlutterLogo(),
+      ),
     ),
     Marker(
       width: 80.0,
       height: 80.0,
       point: LatLng(40, -120), // not visible
       builder: (ctx) => Container(
-            child: FlutterLogo(),
-          ),
+        child: FlutterLogo(),
+      ),
     ),
   ];
 

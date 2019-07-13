@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:flutter_map/latlong/latlong.dart';
 
 import '../widgets/drawer.dart';
 
@@ -24,8 +24,8 @@ class TapToAddPageState extends State<TapToAddPage> {
         height: 80.0,
         point: latlng,
         builder: (ctx) => Container(
-              child: FlutterLogo(),
-            ),
+          child: FlutterLogo(),
+        ),
       );
     }).toList();
 

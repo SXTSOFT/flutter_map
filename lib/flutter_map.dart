@@ -9,7 +9,7 @@ import 'package:flutter_map/src/geo/crs/crs.dart';
 import 'package:flutter_map/src/map/flutter_map_state.dart';
 import 'package:flutter_map/src/map/map.dart';
 import 'package:flutter_map/src/plugins/plugin.dart';
-import 'package:latlong/latlong.dart';
+import 'package:flutter_map/latlong/latlong.dart';
 
 export 'src/core/point.dart';
 export 'src/geo/crs/crs.dart';
@@ -23,6 +23,7 @@ export 'src/layer/polygon_layer.dart';
 export 'src/layer/polyline_layer.dart';
 export 'src/layer/tile_layer.dart';
 export 'src/plugins/plugin.dart';
+export 'src/layer/big_image_layer.dart';
 
 class FlutterMap extends StatefulWidget {
   /// A set of layers' options to used to create the layers on the map

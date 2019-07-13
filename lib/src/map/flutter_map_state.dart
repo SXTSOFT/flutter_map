@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/core/point.dart';
 import 'package:flutter_map/src/gestures/gestures.dart';
+import 'package:flutter_map/src/layer/big_image_layer.dart';
 import 'package:flutter_map/src/layer/group_layer.dart';
 import 'package:flutter_map/src/layer/overlay_image_layer.dart';
 import 'package:flutter_map/src/map/map.dart';
@@ -91,6 +92,10 @@ class FlutterMapState extends MapGestureMixin {
   Widget _createLayer(LayerOptions options, List<MapPlugin> plugins) {
     if (options is TileLayerOptions) {
       return TileLayer(
+          options: options, mapState: mapState, stream: _merge(options));
+    }
+    if (options is BigImageLayerOptions) {
+      return BigImageLayer(
           options: options, mapState: mapState, stream: _merge(options));
     }
     if (options is MarkerLayerOptions) {

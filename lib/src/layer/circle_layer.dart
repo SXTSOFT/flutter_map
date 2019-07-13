@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map/latlong/latlong.dart' hide Path;
 import 'package:flutter_map/src/map/map.dart';
-import 'package:latlong/latlong.dart' hide Path; // conflict with Path from UI
 
 class CircleLayerOptions extends LayerOptions {
   final List<CircleMarker> circles;
