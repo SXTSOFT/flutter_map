@@ -102,7 +102,7 @@ class TileLayerOptions extends LayerOptions {
       this.additionalOptions = const <String, String>{},
       this.subdomains = const <String>[],
       this.keepBuffer = 2,
-      this.backgroundColor = const Color(0xFFE0E0E0),
+      this.backgroundColor = const Color(0xFFFFFFFF),
       this.placeholderImage,
       this.tileProvider = const CachedNetworkTileProvider(),
       this.tms = false,
@@ -394,7 +394,7 @@ class _TileLayerState extends State<TileLayer> {
     var tileSize = getTileSize();
     return Bounds(
       bounds.min.unscaleBy(tileSize).floor(),
-      bounds.max.unscaleBy(tileSize).ceil() - CustomPoint(1, 1),
+      bounds.max.unscaleBy(tileSize).ceil(),
     );
   }
 

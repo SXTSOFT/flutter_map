@@ -66,6 +66,7 @@ class FlutterMapState extends MapGestureMixin {
       var layerWidgetsContainer = Container(
         width: constraints.maxWidth,
         height: constraints.maxHeight,
+        color: Color(0xFFFFFFFF),
         child: Stack(
           children: layerWidgets,
         ),

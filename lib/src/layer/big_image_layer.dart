@@ -41,7 +41,7 @@ class BigImageLayerOptions extends LayerOptions {
       this.zoomOffset = 0.0,
       this.additionalOptions = const <String, String>{},
       this.keepBuffer = 2,
-      this.backgroundColor = const Color(0xFFE0E0E0),
+      this.backgroundColor = const Color(0xFFFFFFFF),
       this.placeholderImage,
       this.tms = false,
       rebuild})
