@@ -22,9 +22,9 @@ dependencies:
       url: http://git.ricent.com:8088/scm/git/flutter_image
       ref: ricent
   
-  cached_network_image: ^0.8.0
+  cached_network_image: ^1.1.1
   # sqflite: ^1.1.5
-  path_provider: ^0.5.0+1
+  path_provider: ^1.2.0
 
 dev_dependencies:
   pedantic: ^1.5.0
