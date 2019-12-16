@@ -16,7 +16,7 @@ dependencies:
   transparent_image: ^1.0.0
   async: ^2.1.0
   validate: ^1.0.0
-  intl: any # 时间
+  intl: 0.16.0 # 时间
   flutter_image:
     git:
       url: http://git.ricent.com:8088/scm/git/flutter_image
