@@ -591,13 +591,15 @@ class SingleImageTileProvider extends TileProvider {
 
 class _SingleImageProvider extends ImageProvider {
   _SingleImageProvider();
+
   @override
-  ImageStreamCompleter load(key) {
+  Future obtainKey(ImageConfiguration configuration) {
     return null;
   }
 
   @override
-  Future obtainKey(ImageConfiguration configuration) {
+  ImageStreamCompleter load(key) {
+    // TODO: implement load
     return null;
   }
 }
