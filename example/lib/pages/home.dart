@@ -73,46 +73,7 @@ class HomePage extends StatelessWidget {
     //         ),
     //   ),
     // ];
-
-    // return Scaffold(
-    //   appBar: AppBar(title: Text('Home')),
-    //   drawer: buildDrawer(context, route),
-    //   body: Padding(
-    //     padding: EdgeInsets.all(8.0),
-    //     child: Column(
-    //       children: [
-    //         Padding(
-    //           padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-    //           child: Text('This is a map that is showing (51.5, -0.9).'),
-    //         ),
-    //         Flexible(
-    //           child: FutureBuilder(
-    //             future: _createOverlayImage("assets/map.jpg"),
-    //             builder: (context, AsyncSnapshot<dynamic> snapshot) {
-    //               return snapshot.hasData
-    //                   ? FlutterMap(
-    //                       options: MapOptions(
-    //                           onTap: (LatLng latLng) {},
-    //                           crs: RicentCrs(),
-    //                           center: LatLng(-128, 128),
-    //                           zoom: 0,
-    //                           swPanBoundary: LatLng(-256, 0),
-    //                           nePanBoundary: LatLng(0, 256)),
-    //                       layers: [
-    //                         OverlayImageLayerOptions(
-    //                             overlayImages: <OverlayImage>[snapshot.data]),
-    //                       ],
-    //                     )
-    //                   : CircularProgressIndicator();
-    //             },
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
-
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(title: Text('Home')),
       drawer: buildDrawer(context, route),
       body: Padding(
@@ -124,32 +85,39 @@ class HomePage extends StatelessWidget {
               child: Text('This is a map that is showing (51.5, -0.9).'),
             ),
             Flexible(
-              child: FutureBuilder(
-                future: _createOverlayImage("assets/map.jpg"),
-                builder: (context, AsyncSnapshot<dynamic> snapshot) {
-                  return FlutterMap(
-                          options: MapOptions(
-                              onTap: (LatLng latLng) {},
-                              crs: RicentCrs(),
-                              center: LatLng(-128, 128),
-                              zoom: 0,
-                              // swPanBoundary: LatLng(-256, 0),
-                              // nePanBoundary: LatLng(0, 256),
-                              ),
-                          layers: [
-                            // OverlayImageLayerOptions(
-                            //     overlayImages: <OverlayImage>[snapshot.data]),
-                             new TileLayerOptions(urlTemplate: "http://dowell1.ricent.com/api/v2/files/49d875a1-e541-4ccc-a5f3-1d1ec893d33b/content/tile/{x}/{y}/{z}")
-                          ],
-                        );
-                },
+              // child: FlutterMap(
+              //   options: MapOptions(
+              //       zoom: 8,
+              //       onTap: (LatLng point) {},
+              //       onLongPress: (LatLng point) {},
+              //       onPositionChanged: (MapPosition position, bool hasGesture,
+              //           bool isUserGesture) {}),
+              //   layers: [
+              //     TileLayerOptions(
+              //       subdomains: ['1', '2', '3'],
+              //       urlTemplate:
+              //           "http://mt{s}.google.cn/vt/lyrs=r&hl=zh-CN&gl=cn&x={x}&y={y}&z={z}",
+              //     ),
+              //   ],
+              // ),
+              child: FlutterMap(
+                options: MapOptions(
+                    crs: RicentCrs(),
+                    center: LatLng(-128, 128),
+                    zoom: 0.5,
+                    maxZoom: 3,
+                    swPanBoundary: LatLng(-256, 0),
+                    nePanBoundary: LatLng(0, 256)),
+                layers: [
+                  TileLayerOptions(
+                      urlTemplate:
+                          'http://yz.chinadydc.com/api/v2/files/104128b1-aa28-4429-ae26-f02d5a132fd6/content/tile/{x}/{y}/{z}'),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
-
-
   }
 }

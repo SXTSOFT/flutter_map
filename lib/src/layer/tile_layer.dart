@@ -102,7 +102,7 @@ class TileLayerOptions extends LayerOptions {
       this.additionalOptions = const <String, String>{},
       this.subdomains = const <String>[],
       this.keepBuffer = 2,
-      this.backgroundColor = const Color(0xFFFFFFFF),
+      this.backgroundColor = const Color(0xFFE0E0E0),
       this.placeholderImage,
       this.tileProvider = const CachedNetworkTileProvider(),
       this.tms = false,
@@ -394,7 +394,7 @@ class _TileLayerState extends State<TileLayer> {
     var tileSize = getTileSize();
     return Bounds(
       bounds.min.unscaleBy(tileSize).floor(),
-      bounds.max.unscaleBy(tileSize).ceil(),
+      bounds.max.unscaleBy(tileSize).ceil() - CustomPoint(1, 1),
     );
   }
 
@@ -591,15 +591,13 @@ class SingleImageTileProvider extends TileProvider {
 
 class _SingleImageProvider extends ImageProvider {
   _SingleImageProvider();
-
   @override
-  Future obtainKey(ImageConfiguration configuration) {
+  ImageStreamCompleter load(key, DecoderCallback decode) {
     return null;
   }
 
   @override
-  ImageStreamCompleter load(key) {
-    // TODO: implement load
+  Future obtainKey(ImageConfiguration configuration) {
     return null;
   }
 }
