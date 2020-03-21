@@ -592,7 +592,7 @@ class SingleImageTileProvider extends TileProvider {
 class _SingleImageProvider extends ImageProvider {
   _SingleImageProvider();
   @override
-  ImageStreamCompleter load(key) {
+  ImageStreamCompleter load(key, DecoderCallback decode) {
     return null;
   }
 

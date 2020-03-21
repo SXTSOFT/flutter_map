@@ -234,7 +234,7 @@ class RicentCrs extends Crs {
 class ProjectionLatlng extends Projection {
   const ProjectionLatlng() : super();
   @override
-  Bounds<double> get bounds => new Bounds<double>(
+  Bounds<double> get bounds => Bounds<double>(
       CustomPoint<double>(-180.0, -90.0), CustomPoint<double>(180.0, 90.0));
 
   @override
