@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map/src/layer/tile_provider/tile_provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -86,13 +87,13 @@ class MBTileImage extends ImageProvider<MBTileImage> {
   MBTileImage(this.database, this.coords);
 
   @override
-  ImageStreamCompleter load(MBTileImage key) {
+  ImageStreamCompleter load(MBTileImage key, decode) {
     return MultiFrameImageStreamCompleter(
         codec: _loadAsync(key),
         scale: 1,
-        informationCollector: (StringBuffer information) {
-          information.writeln('Image provider: $this');
-          information.write('Image key: $key');
+        informationCollector: () sync* {
+          yield DiagnosticsProperty<ImageProvider>('Image provider', this);
+          yield DiagnosticsProperty<ImageProvider>('Image key', key);
         });
   }
 

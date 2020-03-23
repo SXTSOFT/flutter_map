@@ -41,8 +41,8 @@ class MarkerAnchorPageState extends State<MarkerAnchorPage> {
         height: 80.0,
         point: LatLng(51.5, -0.09),
         builder: (ctx) => Container(
-              child: FlutterLogo(),
-            ),
+          child: FlutterLogo(),
+        ),
         anchorPos: anchorPos,
       ),
       Marker(
@@ -50,10 +50,10 @@ class MarkerAnchorPageState extends State<MarkerAnchorPage> {
         height: 80.0,
         point: LatLng(53.3498, -6.2603),
         builder: (ctx) => Container(
-              child: FlutterLogo(
-                colors: Colors.green,
-              ),
-            ),
+          child: FlutterLogo(
+            colors: Colors.green,
+          ),
+        ),
         anchorPos: anchorPos,
       ),
       Marker(
@@ -61,8 +61,8 @@ class MarkerAnchorPageState extends State<MarkerAnchorPage> {
         height: 80.0,
         point: LatLng(48.8566, 2.3522),
         builder: (ctx) => Container(
-              child: FlutterLogo(colors: Colors.purple),
-            ),
+          child: FlutterLogo(colors: Colors.purple),
+        ),
         anchorPos: anchorPos,
       ),
     ];
@@ -81,7 +81,7 @@ class MarkerAnchorPageState extends State<MarkerAnchorPage> {
             ),
             Padding(
               padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-              child: Row(
+              child: Wrap(
                 children: <Widget>[
                   MaterialButton(
                     child: Text('Left'),
@@ -99,13 +99,6 @@ class MarkerAnchorPageState extends State<MarkerAnchorPage> {
                     child: Text('Bottom'),
                     onPressed: () => _setAnchorAlignPos(AnchorAlign.bottom),
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-              child: Row(
-                children: <Widget>[
                   MaterialButton(
                     child: Text('Center'),
                     onPressed: () => _setAnchorAlignPos(AnchorAlign.center),

@@ -1,20 +1,21 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/src/core/bounds.dart';
 import 'package:flutter_map/src/core/point.dart';
 import 'package:flutter_map/src/core/util.dart' as util;
+import 'package:flutter_map/src/geo/crs/crs.dart';
+import 'package:flutter_map/src/layer/tile_provider/tile_provider.dart';
 import 'package:flutter_map/src/map/map.dart';
 import 'package:latlong/latlong.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:tuple/tuple.dart';
-import 'package:flutter_image/network.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import 'layer.dart';
 
+/// Describes the needed properties to create a tile-based layer.
+/// A tile is an image binded to a specific geographical position.
 class TileLayerOptions extends LayerOptions {
   /// Defines the structure to create the URLs for the tiles.
   ///
@@ -30,6 +31,9 @@ class TileLayerOptions extends LayerOptions {
   /// If `true`, inverses Y axis numbering for tiles (turn this on for
   /// [TMS](https://en.wikipedia.org/wiki/Tile_Map_Service) services).
   final bool tms;
+
+  /// If not `null`, then tiles will pull's WMS protocol requests
+  final WMSTileLayerOptions wmsOptions;
 
   /// Size for the tile.
   /// Default is 256
@@ -61,6 +65,9 @@ class TileLayerOptions extends LayerOptions {
   ///Color shown behind the tiles.
   final Color backgroundColor;
 
+  ///Opacity of the rendered tile
+  final double opacity;
+
   /// Provider to load the tiles. The default is CachedNetworkTileProvider,
   /// which loads tile images from network and caches them offline.
   ///
@@ -90,7 +97,27 @@ class TileLayerOptions extends LayerOptions {
   /// When panning the map, keep this many rows and columns of tiles before
   /// unloading them.
   final int keepBuffer;
+
+  /// Placeholder to show until tile images are fetched by the provider.
   ImageProvider placeholderImage;
+
+  /// Static informations that should replace placeholders in the [urlTemplate].
+  /// Applying API keys is a good example on how to use this parameter.
+  ///
+  /// Example:
+  ///
+  /// ```dart
+  ///
+  /// TileLayerOptions(
+  ///     urlTemplate: "https://api.tiles.mapbox.com/v4/"
+  ///                  "{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}",
+  ///     additionalOptions: {
+  ///         'accessToken': '<PUT_ACCESS_TOKEN_HERE>',
+  ///          'id': 'mapbox.streets',
+  ///     },
+  /// ),
+  /// ```
+  ///
   Map<String, String> additionalOptions;
 
   TileLayerOptions(
@@ -106,8 +133,95 @@ class TileLayerOptions extends LayerOptions {
       this.placeholderImage,
       this.tileProvider = const CachedNetworkTileProvider(),
       this.tms = false,
+      // ignore: avoid_init_to_null
+      this.wmsOptions = null,
+      this.opacity = 1.0,
       rebuild})
       : super(rebuild: rebuild);
+}
+
+class WMSTileLayerOptions {
+  final service = 'WMS';
+  final request = 'GetMap';
+
+  /// url of WMS service.
+  /// Ex.: 'http://ows.mundialis.de/services/service?'
+  final String baseUrl;
+
+  /// list of WMS layers to show
+  final List<String> layers;
+
+  /// list of WMS styles
+  final List<String> styles;
+
+  /// WMS image format (use 'image/png' for layers with transparency)
+  final String format;
+
+  /// Version of the WMS service to use
+  final String version;
+
+  /// tile transperency flag
+  final bool transparent;
+
+  // TODO find a way to implicit pass of current map [Crs]
+  final Crs crs;
+
+  /// other request parameters
+  final Map<String, String> otherParameters;
+
+  String _encodedBaseUrl;
+
+  double _versionNumber;
+
+  WMSTileLayerOptions({
+    @required this.baseUrl,
+    this.layers = const [],
+    this.styles = const [],
+    this.format = 'image/png',
+    this.version = '1.1.1',
+    this.transparent = true,
+    this.crs = const Epsg3857(),
+    this.otherParameters = const {},
+  }) {
+    _versionNumber = double.tryParse(version.split('.').take(2).join('.')) ?? 0;
+    _encodedBaseUrl = _buildEncodedBaseUrl();
+  }
+
+  String _buildEncodedBaseUrl() {
+    final projectionKey = _versionNumber >= 1.3 ? 'crs' : 'srs';
+    final buffer = StringBuffer(baseUrl)
+      ..write('&service=$service')
+      ..write('&request=$request')
+      ..write('&layers=${layers.map(Uri.encodeComponent).join(',')}')
+      ..write('&styles=${styles.map(Uri.encodeComponent).join(',')}')
+      ..write('&format=${Uri.encodeComponent(format)}')
+      ..write('&$projectionKey=${Uri.encodeComponent(crs.code)}')
+      ..write('&version=${Uri.encodeComponent(version)}')
+      ..write('&transparent=$transparent');
+    otherParameters
+        .forEach((k, v) => buffer.write('&$k=${Uri.encodeComponent(v)}'));
+    return buffer.toString();
+  }
+
+  String getUrl(Coords coords, int tileSize) {
+    final tileSizePoint = CustomPoint(tileSize, tileSize);
+    final nvPoint = coords.scaleBy(tileSizePoint);
+    final sePoint = nvPoint + tileSizePoint;
+    final nvCoords = crs.pointToLatLng(nvPoint, coords.z);
+    final seCoords = crs.pointToLatLng(sePoint, coords.z);
+    final nv = crs.projection.project(nvCoords);
+    final se = crs.projection.project(seCoords);
+    final bounds = Bounds(nv, se);
+    final bbox = (_versionNumber >= 1.3 && crs is Epsg4326)
+        ? [bounds.min.y, bounds.min.x, bounds.max.y, bounds.max.x]
+        : [bounds.min.x, bounds.min.y, bounds.max.x, bounds.max.y];
+
+    final buffer = StringBuffer(_encodedBaseUrl);
+    buffer.write('&width=$tileSize');
+    buffer.write('&height=$tileSize');
+    buffer.write('&bbox=${bbox.join(',')}');
+    return buffer.toString();
+  }
 }
 
 class TileLayer extends StatefulWidget {
@@ -356,16 +470,14 @@ class _TileLayerState extends State<TileLayer> {
       }
     }
 
-    var tilesToRender = <Tile>[];
-    for (var tile in _tiles.values) {
-      if ((tile.coords.z - _level.zoom).abs() > 1) {
-        continue;
-      }
-      tilesToRender.add(tile);
-    }
+    var tilesToRender = <Tile>[
+      for (var tile in _tiles.values)
+        if ((tile.coords.z - _level.zoom).abs() <= 1) tile
+    ];
+
     tilesToRender.sort((aTile, bTile) {
-      Coords<double> a = aTile.coords;
-      Coords<double> b = bTile.coords;
+      final a = aTile.coords; // TODO there was an implicit casting here.
+      final b = bTile.coords;
       // a = 13, b = 12, b is less than a, the result should be positive.
       if (a.z != b.z) {
         return (b.z - a.z).toInt();
@@ -373,16 +485,18 @@ class _TileLayerState extends State<TileLayer> {
       return (a.distanceTo(tileCenter) - b.distanceTo(tileCenter)).toInt();
     });
 
-    var tileWidgets = <Widget>[];
-    for (var tile in tilesToRender) {
-      tileWidgets.add(_createTileWidget(tile.coords));
-    }
+    var tileWidgets = <Widget>[
+      for (var tile in tilesToRender) _createTileWidget(tile.coords)
+    ];
 
-    return Container(
-      child: Stack(
-        children: tileWidgets,
+    return Opacity(
+      opacity: options.opacity,
+      child: Container(
+        color: options.backgroundColor,
+        child: Stack(
+          children: tileWidgets,
+        ),
       ),
-      color: options.backgroundColor,
     );
   }
 
@@ -497,85 +611,4 @@ class Coords<T extends num> extends CustomPoint<T> {
 
   @override
   int get hashCode => hashValues(x.hashCode, y.hashCode, z.hashCode);
-}
-
-abstract class TileProvider {
-  const TileProvider();
-
-  ImageProvider getImage(Coords coords, TileLayerOptions options);
-
-  void dispose() {}
-
-  String _getTileUrl(Coords coords, TileLayerOptions options) {
-    var data = <String, String>{
-      'x': coords.x.round().toString(),
-      'y': coords.y.round().toString(),
-      'z': coords.z.round().toString(),
-      's': _getSubdomain(coords, options)
-    };
-    if (options.tms) {
-      data['y'] = invertY(coords.y.round(), coords.z.round()).toString();
-    }
-    var allOpts = Map<String, String>.from(data)
-      ..addAll(options.additionalOptions);
-    return util.template(options.urlTemplate, allOpts);
-  }
-
-  int invertY(int y, int z) {
-    return ((1 << z) - 1) - y;
-  }
-
-  String _getSubdomain(Coords coords, TileLayerOptions options) {
-    if (options.subdomains.isEmpty) {
-      return '';
-    }
-    var index = (coords.x + coords.y).round() % options.subdomains.length;
-    return options.subdomains[index];
-  }
-}
-
-class CachedNetworkTileProvider extends TileProvider {
-  const CachedNetworkTileProvider();
-
-  @override
-  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
-    return CachedNetworkImageProvider(_getTileUrl(coords, options));
-  }
-}
-
-class NetworkTileProvider extends TileProvider {
-  @override
-  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
-    return NetworkImageWithRetry(_getTileUrl(coords, options));
-  }
-}
-
-class AssetTileProvider extends TileProvider {
-  @override
-  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
-    return AssetImage(_getTileUrl(coords, options));
-  }
-}
-
-class FileTileProvider extends TileProvider {
-  @override
-  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
-    return FileImage(File(_getTileUrl(coords, options)));
-  }
-}
-
-class CustomTileProvider extends TileProvider {
-  String Function(Coords coors, TileLayerOptions options) customTileUrl;
-
-  CustomTileProvider({@required this.customTileUrl});
-
-  @override
-  String _getTileUrl(Coords coords, TileLayerOptions options) {
-    return customTileUrl(coords, options);
-  }
-
-  @override
-  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
-    return AssetImage(_getTileUrl(coords, options));
-  }
 }
