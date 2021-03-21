@@ -1,11 +1,11 @@
-[![BuildStatus](https://api.travis-ci.org/johnpryan/flutter_map.svg?branch=master)](https://travis-ci.org/johnpryan/flutter_map)
+[![CI](https://github.com/fleaflet/flutter_map/workflows/Tests/badge.svg)](https://github.com/fleaflet/flutter_map/actions?query=branch%3Amaster)
 [![Pub](https://img.shields.io/pub/v/flutter_map.svg)](https://pub.dev/packages/flutter_map)
 
 # flutter_map
 
 A Dart implementation of [Leaflet] for Flutter apps.
 
-## Usage
+## Installation
 
 Add flutter_map to your pubspec:
 
@@ -14,33 +14,39 @@ dependencies:
   flutter_map: any # or the latest version on Pub
 ```
 
+### Android
+
+Ensure the following permission is present in your Android Manifest file, located in `<project root>/android/app/src/main/AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+## Usage
+
 Configure the map using `MapOptions` and layer options:
 
 ```dart
 Widget build(BuildContext context) {
-  return new FlutterMap(
-    options: new MapOptions(
-      center: new LatLng(51.5, -0.09),
+  return FlutterMap(
+    options: MapOptions(
+      center: LatLng(51.5, -0.09),
       zoom: 13.0,
     ),
     layers: [
-      new TileLayerOptions(
-        urlTemplate: "https://api.tiles.mapbox.com/v4/"
-            "{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}",
-        additionalOptions: {
-          'accessToken': '<PUT_ACCESS_TOKEN_HERE>',
-          'id': 'mapbox.streets',
-        },
+      TileLayerOptions(
+        urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        subdomains: ['a', 'b', 'c']
       ),
-      new MarkerLayerOptions(
+      MarkerLayerOptions(
         markers: [
-          new Marker(
+          Marker(
             width: 80.0,
             height: 80.0,
-            point: new LatLng(51.5, -0.09),
+            point: LatLng(51.5, -0.09),
             builder: (ctx) =>
-            new Container(
-              child: new FlutterLogo(),
+            Container(
+              child: FlutterLogo(),
             ),
           ),
         ],
@@ -48,6 +54,15 @@ Widget build(BuildContext context) {
     ],
   );
 }
+```
+
+Alternatively initialize the map by specifying bounds instead of center and zoom.
+
+```dart
+MapOptions(
+  bounds: LatLngBounds(LatLng(58.8, 6.1), LatLng(59, 6.2)),
+  boundsOptions: FitBoundsOptions(padding: EdgeInsets.all(8.0)),
+),
 ```
 
 ### Azure Maps provider
@@ -122,6 +137,55 @@ Widget build(BuildContext context) {
 }
 ```
 
+### Widget Layers
+
+__Use the new way to create layers__ (compatible with previous version)
+
+```dart
+Widget build(BuildContext context) {
+  return FlutterMap(
+    options: MapOptions(
+      center: LatLng(51.5, -0.09),
+      zoom: 13.0,
+    ),
+    layers: [
+      MarkerLayerOptions(
+        markers: [
+          Marker(
+            width: 80.0,
+            height: 80.0,
+            point: LatLng(51.5, -0.09),
+            builder: (ctx) =>
+            Container(
+              child: FlutterLogo(),
+            ),
+          ),
+        ],
+      ),
+    ],
+    children: <Widget>[
+      TileLayerWidget(options: TileLayerOptions(
+        urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        subdomains: ['a', 'b', 'c']
+      )),
+      MarkerLayerWidget(options: MarkerLayerOptions(
+        markers: [
+          Marker(
+            width: 80.0,
+            height: 80.0,
+            point: LatLng(51.5, -0.09),
+            builder: (ctx) =>
+            Container(
+              child: FlutterLogo(),
+            ),
+          ),
+        ],
+      )),
+    ],
+  );
+}
+```
+
 ### Custom CRS
 
 By default flutter_map supports only WGS84 (EPSG:4326) and Google Mercator (EPSG:3857) projections. With the integration of [proj4dart](https://github.com/maRci002/proj4dart) any coordinate reference systems (CRS) can be defined and used.
@@ -136,7 +200,7 @@ var epsg3413CRS = Proj4Crs.fromFactory(
   code: 'EPSG:3413',
   proj4Projection:
       proj4.Projection.add('EPSG:3413', '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'),
-  resolutions: resolutions
+  resolutions: resolutions,
 );
 ```
 
@@ -164,6 +228,45 @@ child: FlutterMap(
 ```
 
 For more details visit [Custom CRS demo page](./example/lib/pages/custom_crs/Readme.md).
+
+### How to Cache Tiles (Custom TileProvider)
+
+1. Using Flutter's NetworkImage:
+Flutter has a built in ImageProvider (NetworkImage) that caches images in memory until an app restart.
+```dart
+class CachedTileProvider extends TileProvider {
+  const CachedTileProvider();
+  @override
+  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
+    return NetworkImage(getTileUrl(coords, options));
+  }
+}
+```
+
+2. Using the `cached_network_image` dependency:
+This dependency has an ImageProvider that caches to disk which means the cache persists through an app restart.
+```dart
+import 'package:cached_network_image/cached_network_image.dart';
+
+class CachedTileProvider extends TileProvider {
+  const CachedTileProvider();
+  @override
+  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
+    return CachedNetworkImageProvider(
+      getTileUrl(coords, options),
+      //Now you can set options that determine how the image gets cached via whichever plugin you use.
+    );
+  }
+}
+```
+
+Lastly we need to add the CachedTileProvider TileProvider to TileLayerOptions
+```dart
+TileLayerOptions(
+  urlTemplate: 'https://example.com/{x}/{y}/{z}',
+  tileProvider: const CachedTileProvider()
+)
+```
 
 ## Run the example
 
@@ -207,6 +310,13 @@ Note that there is also `FileTileProvider()`, which you can use to load tiles fr
 
 - [flutter_map_marker_cluster](https://github.com/lpongetti/flutter_map_marker_cluster): Provides Beautiful Animated Marker Clustering functionality
 - [user_location](https://github.com/igaurab/user_location_plugin): A plugin to handle and plot the current user location in FlutterMap
+- [flutter_map_location](https://github.com/Xennis/flutter_map_location): A plugin to request and display the users location and heading on the map
+- [flutter_map_location_marker](https://github.com/tlserver/flutter_map_location_marker): A simple and powerful plugin display the users location and heading
+- [flutter_map_tappable_polyline](https://github.com/OwnWeb/flutter_map_tappable_polyline): A plugin to add `onTap` callback to `Polyline`
+- [lat_lon_grid_plugin](https://github.com/mat8854/lat_lon_grid_plugin): Adds a latitude / longitude grid as plugin to the FlutterMap
+- [flutter_map_marker_popup](https://github.com/rorystephenson/flutter_map_marker_popup): A plugin to show customisable popups for markers.
+- [map_elevation](https://github.com/OwnWeb/map_elevation): A widget to display elevation of a track (polyline) like Leaflet.Elevation
+- [flutter_map_floating_marker_titles](https://github.com/androidseb/flutter_map_floating_marker_titles): Displaying floating marker titles on the map view
 
 ## Roadmap
 
