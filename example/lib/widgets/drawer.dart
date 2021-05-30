@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map_example/pages/marker_rotate.dart';
 
 import '../pages/animated_map_controller.dart';
 import '../pages/circle.dart';
@@ -7,6 +8,7 @@ import '../pages/esri.dart';
 import '../pages/home.dart';
 import '../pages/interactive_test_page.dart';
 import '../pages/live_location.dart';
+import '../pages/many_markers.dart';
 import '../pages/map_controller.dart';
 import '../pages/marker_anchor.dart';
 import '../pages/moving_markers.dart';
@@ -18,6 +20,7 @@ import '../pages/plugin_scalebar.dart';
 import '../pages/plugin_zoombuttons.dart';
 import '../pages/polyline.dart';
 import '../pages/sliding_map.dart';
+import '../pages/stateful_markers.dart';
 import '../pages/tap_to_add.dart';
 import '../pages/tile_builder_example.dart';
 import '../pages/tile_loading_error_handle.dart';
@@ -106,6 +109,12 @@ Drawer buildDrawer(BuildContext context, String currentRoute) {
         ),
         _buildMenuItem(
           context,
+          const Text('Marker Rotate'),
+          MarkerRotatePage.route,
+          currentRoute,
+        ),
+        _buildMenuItem(
+          context,
           const Text('Plugins'),
           PluginPage.route,
           currentRoute,
@@ -188,6 +197,19 @@ Drawer buildDrawer(BuildContext context, String currentRoute) {
           InteractiveTestPage.route,
           currentRoute,
         ),
+        ListTile(
+          title: const Text('A lot of markers'),
+          selected: currentRoute == ManyMarkersPage.route,
+          onTap: () {
+            Navigator.pushReplacementNamed(context, ManyMarkersPage.route);
+          },
+        ),
+        _buildMenuItem(
+          context,
+          const Text('Stateful markers'),
+          StatefulMarkersPage.route,
+          currentRoute,
+        )
       ],
     ),
   );
